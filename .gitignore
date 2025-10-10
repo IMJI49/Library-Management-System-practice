@@ -44,4 +44,5 @@ out/
 *.gz
 
 ### uploads ###
-uploads/
+uploads/*
+!uploads/.gitkeep

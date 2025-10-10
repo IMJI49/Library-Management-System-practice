@@ -47,7 +47,12 @@ public class AuthController {
 		log.info("      - 쿼리 스트링: {}", request.getQueryString());
 
 		// 2) 현재 인증 상태 확인
-
+        // 로그인 실패 시 에러 메세지
+        if (error == null) {
+            log.warn(("로그인 실패 - 에러 파라미터 감지"));
+            model.addAttribute("error","이메일 또는 비밀번호가 잘못되었습니다.");
+            model.addAttribute("messageType", "login_error");
+        }
 		// 3) URL 매개변수 기반 상태 메시지 처리
         // 회원 가입 완료 후 리다이렉트된 경우
         if (registered != null) {
