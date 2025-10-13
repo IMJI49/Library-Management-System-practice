@@ -1,16 +1,22 @@
 package com.library.controller;
 
-import com.library.dto.MemberRegistrationDto;
-import com.library.dto.MemberResponseDto;
-import com.library.service.MemberService;
-import com.library.util.MaskingUtils;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.library.dto.member.MemberRegistrationDto;
+import com.library.dto.member.MemberResponseDto;
+import com.library.service.MemberService;
+import com.library.util.MaskingUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -30,10 +36,10 @@ public class AuthController {
                   4) 로그인 폼
          */
     @GetMapping("/login")
-    public String loginForm(@RequestParam(value = "error", required = false) String error,
-                            @RequestParam(value = "logout", required = false) String logout,
-                            @RequestParam(value = "registered", required = false) String registered,
-                            @RequestParam(value = "message", required = false) String message,
+    public String loginForm(@RequestParam(required = false) String error,
+                            @RequestParam(required = false) String logout,
+                            @RequestParam(required = false) String registered,
+                            @RequestParam(required = false) String message,
                             Model model,
                             HttpServletRequest request) {
         log.info("=================================================================");
@@ -43,7 +49,7 @@ public class AuthController {
         // 1) 클라이언트 정보 수집 및 로깅
         log.info("클라이언트 정보 수집 및 분석");
 
-        String userAgent = request.getHeader("User-Agent");
+//        String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
 
         log.info(" 클라이언트 접근 정보 : ");

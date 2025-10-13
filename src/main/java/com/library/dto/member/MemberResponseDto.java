@@ -1,17 +1,12 @@
-package com.library.dto;
+package com.library.dto.member;
+
+import com.library.entity.member.Member;
+import com.library.entity.member.MemberStatus;
+import com.library.entity.member.MemberType;
+import com.library.entity.member.Role;
+import lombok.*;
 
 import java.time.LocalDateTime;
-
-import com.library.entity.Member;
-import com.library.entity.MemberStatus;
-import com.library.entity.MemberType;
-import com.library.entity.Role;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /*
  * 회원 정보 응답 dto

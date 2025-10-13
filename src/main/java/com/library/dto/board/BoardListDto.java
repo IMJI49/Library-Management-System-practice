@@ -1,13 +1,14 @@
 package com.library.dto.board;
 
+import java.time.LocalDateTime;
+
+import com.library.entity.board.Board;
 import com.library.entity.board.BoardCategory;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 게시글 목록 조회용 DTO
@@ -22,9 +23,29 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BoardDto implements Serializable {
-    LocalDateTime createdAt;
-    Long id;
-    String title;
-    BoardCategory category;
+public class BoardListDto{
+    private LocalDateTime createdAt;
+    private Long id;
+    private String title;
+    private BoardCategory category;
+    private String authorName;
+    private Long viewCount;
+    private Long LikeCount;
+    private Long CommentCount;
+    /*
+        board Entity를 BoardListDto로 변환하는 정적 메소드
+            - Board Entity와 연관된 Member Entity의 정보를 함께 추출함
+     */
+    public static BoardListDto from(Board board) {
+        return BoardListDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .category(board.getCategory())
+                .authorName(board.getAuthor().getName())
+                .viewCount(board.getViewCount())
+                .LikeCount(board.getLikeCount())
+                .CommentCount(0L)
+                .createdAt(board.getCreatedAt())
+                .build();
+    }
 }

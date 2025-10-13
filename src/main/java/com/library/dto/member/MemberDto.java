@@ -1,8 +1,8 @@
-package com.library.dto;
+package com.library.dto.member;
 
-import com.library.entity.MemberStatus;
-import com.library.entity.MemberType;
-import com.library.entity.Role;
+import com.library.entity.member.MemberStatus;
+import com.library.entity.member.MemberType;
+import com.library.entity.member.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

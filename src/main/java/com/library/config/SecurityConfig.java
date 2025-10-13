@@ -38,7 +38,7 @@ public class SecurityConfig {
             - BCrypt 해시 함수 사용, 단방향 암호화 (복호화 불가능)
      */
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         log.info("PasswordEncoder Bean 생성 - BCryptPasswordEncoder");
         return new BCryptPasswordEncoder();
     }
@@ -49,7 +49,7 @@ public class SecurityConfig {
             - 실제 인증 로직 수행
      */
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authenticationProvider() {
         log.info("=== AuthenticationProvider 설정 시작 ===");
 
         DaoAuthenticationProvider authProvider =
@@ -70,7 +70,7 @@ public class SecurityConfig {
             - CSRF(Cross-Site Request Forgery, 사이트 간 요청 위조), 세션 등 보안 설정
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("=== Spring Security 필터 체인 설정 시작 === ");
 
         http

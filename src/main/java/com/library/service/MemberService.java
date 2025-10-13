@@ -1,11 +1,11 @@
 package com.library.service;
 
-import com.library.dto.MemberRegistrationDto;
-import com.library.dto.MemberResponseDto;
-import com.library.entity.Member;
-import com.library.entity.MemberStatus;
-import com.library.entity.MemberType;
-import com.library.entity.Role;
+import com.library.dto.member.MemberRegistrationDto;
+import com.library.dto.member.MemberResponseDto;
+import com.library.entity.member.Member;
+import com.library.entity.member.MemberStatus;
+import com.library.entity.member.MemberType;
+import com.library.entity.member.Role;
 import com.library.repository.MemberRepository;
 import com.library.util.MaskingUtils;
 import lombok.RequiredArgsConstructor;

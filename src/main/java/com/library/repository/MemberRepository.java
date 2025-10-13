@@ -1,10 +1,9 @@
 package com.library.repository;
 
-import java.util.Optional;
-
+import com.library.entity.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.library.entity.Member;
+import java.util.Optional;
 
 /*
  * 회원 데이터 접근 리포짓토리
