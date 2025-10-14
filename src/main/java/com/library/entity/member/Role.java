@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter@AllArgsConstructor
 public enum Role {
 	USER("Role_USER","일반 사용자"),
-	LIBRARIA("ROLE_LIBRARIAN","사서"),
+	LIBRARIAN("ROLE_LIBRARIAN","사서"),
 	ADMIN("ROLE_ADMIN","관리자");
 	private final String key;
 	private final String description;
@@ -18,7 +18,7 @@ public enum Role {
 	public int getLevel() {
         return switch (this) {
             case USER -> 1;
-            case LIBRARIA -> 2;
+            case LIBRARIAN -> 2;
             case ADMIN -> 3;
         };
 	}

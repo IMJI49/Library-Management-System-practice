@@ -12,9 +12,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <!-- 왼쪽 메인 메뉴 -->
             <ul class="navbar-nav me-auto">
+                <!-- 홈메뉴 -->
                 <li class="nav-item"><a href="/" class="nav-link">
-                    <i class="fas fa-home"></i>
+                    <i class="fas fa-home"></i> 홈
                 </a></li>
+                <!-- 게시판 메뉴 -->
+                <li class="nav-item">
+                    <a th:href="@{/boards}" class="nav-link">
+                        <i class="fas fa-clipboard-list"></i> 게시판
+                    </a>
+                </li>
             </ul>
             <!-- 오른쪽 메뉴 -->
             <ul class="navbar-nav">
@@ -31,7 +38,7 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a th:href="@{/member/profile}" class="dropdown-item">
                             <i class="fas fa-user me-2"></i>
-                            내 정보
+                            <span sec:authenticated="principal name"></span>
                         </a></li>
                         <li><hr class="dropdown-driver"></li>
                         <li>
