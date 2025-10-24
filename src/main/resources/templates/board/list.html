@@ -221,7 +221,7 @@
                         </td>
                         <!-- 제목 (클릭 시 상세 페이지로 이동) -->
                         <td class="title">
-                            <a th:href="@{/boards/{id}(id=${board.id})}" th:text="${board.title}">게시글 제목</a>
+                            <a th:href="@{/boards/{id}(id=${board.id}, page=${currentPage})}" th:text="${board.title}">게시글 제목</a>
                             <!-- 댓글 수 (댓글 있을때만) -->
                             <span class="comment-count" th:if="${board.commentCount > 0}" th:text="|[${board.commentCount}]|">(0)</span>
                         </td>

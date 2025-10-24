@@ -1,22 +1,16 @@
 package com.library.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.library.dto.member.MemberRegistrationDto;
 import com.library.dto.member.MemberResponseDto;
 import com.library.service.MemberService;
 import com.library.util.MaskingUtils;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -57,6 +51,10 @@ public class AuthController {
         log.info("      - 접근 시간: {}", new java.util.Date());
         log.info("      - 요청 URI: {}", request.getRequestURI());
         log.info("      - 쿼리 스트링: {}", request.getQueryString());
+        if( referer != null && !referer.contains("/login") ) {
+            request.getSession().setAttribute("prevPage", referer);
+            log.info("URL : {}",request.getSession().getAttribute("prevPage").toString());
+        }
 
         // 2) 현재 인증 상태 확인
 
@@ -85,6 +83,7 @@ public class AuthController {
             model.addAttribute("message", "성공적으로 로그아웃되었습니다.");
             log.info("로그아웃 성공 -- 메시지 표시");
         }
+        model.addAttribute("msg",message);
 
         return "auth/login";
     }
