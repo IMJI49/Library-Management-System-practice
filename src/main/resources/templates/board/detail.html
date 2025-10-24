@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{common/layout :: layout(~{::title}, ~{::content}, ~{::css}, ~{::scripts})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세</title>
+    <th:block th:fragment="css">
+        <style>
+            /* === 게시글 상세 컨테이너 === */
+            .board-detail{
+                max-width: 900px;
+                margin: 0 auto;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .board-header{
+                padding: 30px;
+                border-bottom: 2px solid #e9ecef;
+            }
+            .board-title{
+                font-size: 28px;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 20px;
+                line-height: 1.4;
+            }
+            .board-meta{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 15px;
+                color: #6c757d;
+                font-size: 14px;
+            }
+            .meta-left{
+                display: flex;
+                gap: 20px;
+                align-items: center;
+            }
+            .meta-right{
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            }
+            .meta-item{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            /* 메타 정보 아이콘 색상 */
+            .meta-item i{
+                color: #007bff;
+            }
+            .board-content{
+                padding: 30px;
+                min-height: 300px;
+                line-height: 1;
+                color: #333;
+                font-size: 16px;
+                border-bottom: 2px solid #e9ecef;
+            }
+            .board-content p{
+                margin-bottom: 1rem;
+            }
+            .category-badge{
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+            .category-badge.NOTICE{
+                background-color: #dc3545;
+                color: white;
+            }
+            /* 자유게시판 카테고리 - 파란색 */
+            .category-badge.FREE{
+                background-color: #28a745;
+                color: white;
+            }
+            /* 질문게시판 카테고리 - 노란색 */
+            .category-badge.QNA{
+                background-color: #ffc107;
+                color: #333;
+            }
+            /* 리뷰 카테고리 - 연두색 */
+            .category-badge.REVIEW{
+                background-color: #17a2b8;
+                color: white;
+            }
+            /* === 게시글 푸터(버튼 영역) === */
+            .board-footer{
+                padding: 20px 30px;
+                text-align: right;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .btn-group{
+                display: flex;
+                gap: 10px;
+            }
+            /* alert 기본 스타일 */
+            .alert{
+                padding: 12px 16px;
+                border: 1px solid;
+                border-radius: 4px;
+            }
+            /* 첨부파일 영역 */
+            .board-files{
+                padding: 30px;
+                border-bottom: 2px solid #e9ecef;
+                background-color: #f8f9fa;
+            }
+            .files-header{
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #333;
+            }
+            .files-header i{
+                color: #007bff;
+            }
+            .file-list{
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            .file-item{
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 12px 15;
+                background-color: white;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+            }
+            .file-item:hover{
+                background-color: #f8f9fa;
+                border-color: #007bff;
+                transform: translateY(5px);
+            }
+            .file-item:last-child{
+                margin-bottom: 0;
+            }
+            .file-icon{
+                font-size: 20px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                margin-right: 12px;
+            }
+            .file-icon.IMAGE{
+                background-color: #e3f2fd;
+                color: #1976d2;
+            }
+            .file-icon.DOCUMENT{
+                background-color: #fff3e0;
+                color: #f57c00;
+            }
+            .file-icon.ARCHIVE{
+                background-color: #f3e5f5;
+                color: #7b1fa2;
+            }
+            .file-icon.OTHER{
+                background-color: #e0e0e0;
+                color: #616161;
+            }
+            .file-info{
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .file-name{
+                font-size: 15;
+                font-weight: 500;
+                color: #333;
+                word-break: break-all;
+            }
+            .file-meta{
+                font-size: 13px;
+                color: #6c757d;
+                display: flex;
+                gap: 12px;
+            }
+            .file-meta i{
+                margin-right: 4px;
+                color: #007bff;
+            }
+            .file-download-btn{
+                background-color: #007bff;
+                color: white;
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 14px;
+                transition: background-color 0.2s ease;
+                cursor: pointer;
+                white-space: nowrap;
+            }
+            .file-download-btn:hover{
+                background-color: #0056b3;
+                text-decoration: none;
+            }
+            .file-download-btn i{
+                margin-right: 4px;
+            }
+            /* 댓글 섹션 스타일 */
+            .comment-section {
+                padding: 30px;
+                background-color: #f8f9fa;
+            }
+            .comment-header{
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #dee2e6;
+            }
+            .comment-header h3 {
+                font-size: 20px;
+                font-weight: bold;
+                color: #333;
+                margin: 0;
+            }
+            .comment-header i {
+                color: #007bff;
+                margin-right: 8px;
+            }
+            /* === 댓글 작성 폼 (로그인 사용자용) === */
+            .comment-write{
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #dee2e6;
+                margin-bottom: 20px;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+            .comment-write textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-family: inherit;
+                font-size: 14px;
+                resize: vertical;      /* 세로 방향으로만 크기 조절 가능 */
+                margin-bottom: 10px;
+            }
+            .comment-write textarea:focus {
+                outline: none;
+                border-color: #007bff;
+                box-shadow: 0 0 5px rgba(0,123,255,0.5);
+            }
+            .comment-write .btn {
+                float: right;
+                box-sizing: border-box;
+            }
+            /* === 로그인 안내 === */
+            .comment-login-required {
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                border: 1px solid #dee2e6;
+                text-align: center;
+                color: #6c757d;
+                margin-bottom: 20px;
+            }
+            .comment-login-required i {
+                font-size: 40px;
+                margin-bottom: 10px;
+                color: #adb5bd;
+            }
+            .comment-login-required p {
+                margin: 0;
+                font-size: 16px;
+            }
+            .comment-login-required a {
+                color: #007bff;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .comment-login-required a:hover {
+                text-decoration: underline;
+            }
+            /* 댓글 목록 컨테이너 */
+            .comment-list {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            /* 댓글 없을 때 안내 메세지 */
+            .no-comments{
+                text-align: center;
+                padding: 40px;
+                color: #6c757d;
+                background-color: #fff;
+                border-radius: 8px;
+                border: 1px solid #d332e6;
+            }
+            .no-comments i{
+                font-size: 48px;
+                margin-bottom: 15px;
+                color: #adb5bd;
+            }
+            .no-comments p{
+                margin: 0;
+                font-size: 16px;
+            }
+            /* 개별 댓글 아이템 */
+            .comment-item {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #dee2e6;
+            }
+            /* 댓글 헤더 */
+            .comment-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+            /* 작성자 정보 영역 */
+            .comment-author {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .comment-author i {
+                font-size: 24px;
+                color: #6c757d;
+            }
+            .comment-author-name {
+                font-weight: 600;
+                color: #333;
+            }
+            .comment-date {
+                font-size: 13px;
+                color: #6c757d;
+            }
+            /* 댓글 작업 버튼 그룹(수정,삭제) */
+            .comment-actions {
+                display: flex;
+                gap: 8px;
+            }
+            .comment-actions .btn {
+                font-size: 13px;
+                padding: 4px 12px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <!-- 메인 컨텐츠 영역(layout.html의 <main>에 삽입됨 ) -->
+    <div th:fragment="content">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${success}" style="margin: 20px auto;max-width: 900px;margin-bottom: 20px;">
+            ✅ <span th:text="${success}">성공 메시지</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="board-detail">
+            <!-- 게시글 헤더 영역 -->
+            <div class="board-header">
+                <div class="board-title" th:text="${board.title}">게시글 제목</div>
+                <!-- 게시글 메타 정보 영역 -->
+                <div class="board-meta">
+                    <div class="meta-left">
+                        <span class="category-badge" th:classappend="${board.category.name()}" th:text="${board.category.displayName}">
+                            카테고리
+                        </span>
+                        <span class="meta-item">
+                            
+                            <i class="fas fa-user"></i>
+                            <span th:text="${board.authorName}">작성자</span>
+                        </span>
+                        <span class="meta-item">
+                            
+                            <i class="fas fa-calendar"></i> 
+                            <span th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</span>
+                            </span>
+                    </div>
+                    <!-- 우측 정보 조회수, 좋아요, 댓글수 -->
+                    <div class="meta-right">
+                        <span class="meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span th:text="${board.viewCount}">0</span>
+                        </span>
+                        <span class="meta-item">
+                            
+                            <i class="fas fa-heart"></i>
+                            <span th:text="${board.likeCount}">0</span>
+                        </span>
+                        <span class="meta-item">
+                            
+                            <i class="fas fa-comment"></i>
+                            <span th:text="${board.commentCount}">0</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- 게시글 본문 영역 -->
+            <div class="board-content" th:text="${board.content}" style="white-space: pre-wrap;word-wrap: break-word;">
+                게시글 내용
+            </div>
+            <!-- 첨부 파일 영역, 첨부파일이 존재 할 경우에만 표시 -->
+            <div class="board-files" th:if="${not #lists.isEmpty(board.files)}">
+                <div class="files-header">
+                    <i class="fas fa-paperclip"></i>
+                    <span>첨부 파일(<span th:text="${#lists.size(board.files)}"></span>개) </span>
+                </div>
+                <ul class="file-list">
+                    <li th:each="file : ${board.files}" class="file-item">
+                        <div class="file-icon" th:classappend="${file.getFileType}">
+                            <i class="fas" th:classappend="${file.getFileIconClass}"></i>
+                        </div>
+                        <div class="file-info">
+                            <a th:href="@{/files/download/{id}(id=${file.id})}" th:text="${file.originalFilename}" class="file-name">파일이름</a>
+                            <div class="file-meta"> 
+                                <span><i class="fas fa-hdd"></i><span  th:text="${file.getFormatedFileSize}"></span></span>
+                                <span><i class="fas fa-download"></i><span th:text="${file.downloadCount}"></span>회</span>
+                            </div>
+                        </div>
+                        <!-- 파일 다운로드 버튼(get /files/download/) -->
+                    </li>
+                </ul>
+            </div>
+            <!-- 게시글 푸터 영역 -->
+            <div class="board-footer">
+                <div class="btn-group">
+                    <!-- 목록으로 -->
+                    <a th:href="@{/boards(page=${currentPage})}" class="btn btn-outline">
+                        <i class="fas fa-list"></i> 목록으로
+                    </a>
+                </div>
+                <div class="btn-group" sec:authorize="isAuthenticated()" th:if="${#authentication.name == board.authorEmail}">
+                    <!-- 추후 구현 예정 -->
+                    <!-- 수정하기 (작성자 본인만 표시) -->
+                    <a th:href="@{/boards/edit/{id}(id=${board.id}, page=${currentPage})}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> 수정하기
+                    </a>
+                    <!-- 삭제하기 (작성자 본인만 표시) -->
+                    <!-- <form th:action="@{/boards/delete/{id}(id=${board.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('정말 삭제하시겠습니까?');">
+                            <i class="fas fa-trash-alt "></i> 삭제하기
+                        </button>
+                    </form> -->
+                    <button type="button" class="btn btn-danger" onclick="deleteBoard()">
+                        <i class="fas fa-trash-alt"></i> 삭제하기
+                    </button>
+                </div>
+            </div>
+            <!-- 댓글 섹션 -->
+            <!-- 1. HTML 구조 작성 -->
+            <div class="comment-section">
+                <div class="comment-header">
+                    <h3>
+                        <i class="fas fa-comments"></i> 댓글
+                        <span id="commentCount">0</span>
+                    </h3>
+                </div>
+                <div class="comment-write" sec:authorize="isAuthenticated()">
+                    <textarea name="commentContent" id="commentContent" placeholder="댓글을 입력하세요." rows="3"></textarea>
+                    <button type="button" class="btn btn-primary" id="createCommentBtn">
+                        <i class="fas fa-paper-plane"></i> 댓글 작성
+                    </button>
+                </div>
+                <!-- 4. 로그인 안내 메세지 -->
+                <div class="comment-login-required" sec:authorize="!isAuthenticated()">
+                    <i class="fas fa-lock"></i>
+                    <p>댓글을 작성하려면 <a th:href="@{/auth/login}">로그인</a>이 필요합니다.</p>
+                </div>
+                <!-- 5. 댓글 목록 컨테이너 -->
+                <div id="commentList" class="comment-list">
+                    <!-- JavaScript로 동적으로 댓글이 추가됩니다. -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:fragment="scripts">
+        <script>
+            /*
+                게시글 삭제 함수
+                    - 사용자에게 삭제 확인을 받은 후 DELETE요청을 보냄
+                    - HTML form을 동적으로 생성하여 제출
+            */
+           function deleteBoard(){
+                // 1) 사용자에게 삭제 확인
+                if(!confirm('정말 삭제하시겠습니까?')){
+                    return;
+                }
+                // 2) 타임리프로 게시글 ID 가져오기
+                //  - [[${expression}]] : 타임리프 인라인 표션식 - 서버 변수를 JS 변수로 변환
+                const boardId = [[${board.id}]];
+                // 3) HTML form 동적 생성 - javascript로 form 요소 생성
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = `/boards/delete/${boardId}`;
+                // 4) Spring이 DELETE로 인식 - _method 필드 추가
+                // 브라우저는 form으로 delete 메소드를 직접 보낼 수 없음 
+                // post로 보내고 _method=DELETE로 spring에게 알려줌
+                // spring의 HiddenHttpMethodFilter가 이를 감지하여 DELETE로 처리
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                form.appendChild(methodInput);
+                // 5) CSRF 토큰 추가
+                // 메타 태그에서 CSRF 토큰과 헤더 이름을 읽어옴
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+                // 6) form을 문서에 추가하고 제출
+                document.body.appendChild(form);
+                form.submit();                
+           }
+        </script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            // 6. 전역 변수 선언 및 초기화
+            // 6-1. Thymeleaf 인라인 표현식으로 서버 데이터를 javaScript 변수로 변환
+            const boardId = /*[[${board.id}]]*/ 0;  // 게시글 ID
+            const currentUserEmail = /*[[${#authentication.name}]]*/ ''; // 현재 로그인한 사용자 이메일 (비로그인 시 빈 문자열)
+            // 6-2. csrf - 토큰 정보 가져오기 layout.html의 메타태그에서 읽어옴
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            // 7. 페이지 로드 이벤트 처리
+            //  7-1 . DOMContentLoaded : HTML 문서가 완전히 로드되고 DOM 트리가 완성된 후 발생
+            document.addEventListener('DOMContentLoaded', function(){
+                // 7-2. 페이지 로드 즉시 댓글 목록 조회
+                loadComments();
+                // 댓글 작성 버튼 이벤트 바인딩
+                // 7-3. 댓글 작성 버튼에 이벤트 리스너 등록
+                document.getElementById('createCommentBtn').addEventListener('click', createComment);
+            });
+            // 8. 댓글 목록 조회 (GET 요청)
+            function loadComments(){
+                fetch(`/api/comments/boards/${boardId}`)
+                .then(response => response.json())  // 8-2 : 응답을 JSON으로 파싱
+                .then(data => {
+                    // 8-3 변환된 댓글 배열 받기
+                    renderComments(data); // 8-4 댓글 목록 화면에 표시
+                })
+                .catch(error => {
+                    console.error('댓글 로드 오류:', error);
+                    alert('댓글을 불러오는 중 오류가 발생했습니다.');
+                });
+            }
+            // 9. 댓글 랜더링 함수
+            function renderComments(comments){
+                    const commentList = document.getElementById('commentList');
+                    const commentCount = document.getElementById('commentCount');
+                    commentCount.textContent = comments.length;
+                    if(comments.length === 0){
+                        commentList.innerHTML = `
+                            <div class="no-comments">
+                                <i class="fas fa-comments"></i>
+                                <p>첫 댓글을 작성해 보세요</p>
+                            </div>
+                            `;
+                        return;
+                    }
+                    commentList.innerHTML = comments.map(comment => createCommentHTML(comment)).join('');
+            }
+            // 10. 개별 댓글 HTML 생성
+            function createCommentHTML(comment){
+                // 10-1. 날짜 포맷팅
+                const createdAt = new Date(comment.createdAt);
+                const formattedDate = createdAt.toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                // 10-2. 작성자 여부에 따른 클래스 추가 (추후 기능 구현 시 사용)
+                const isAuthor = (currentUserEmail === comment.authorEmail);
+                // 10-3. 댓글 HTML 반환
+                return `
+                    <!-- 10-3-1. 댓글 컨테이너 (고유 ID로 개별 댓글 식별) -->
+                    <div class="comment-item" id="comment-${comment.id}">
+                        <!-- 10-3-2. 댓글 헤더 : 작성자 정보 및 작업 버튼 -->
+                        <div class="comment-header">
+                            <!-- 10-3-3. 작성자 정보 : 아이콘, 이름, 일시 -->
+                            <div class="comment-author">
+                                <i class="fas fa-user-circle"></i>
+                                <span class="comment-author-name">${comment.authorName}</span>
+                                <span class="comment-date">${formattedDate}</span>
+                            </div>
+                            <!-- 10-3-4. 작업 버튼 (수정, 삭제) : 작성자 본인일 경우에만 표시 (삼항 연산자 사용) -->
+                            <div class="comment-actions">
+                                <!-- 수정 및 삭제 버튼은 작성자 본인에게만 표시 -->
+                                ${isAuthor ? `
+                                <button class="btn btn-sm btn-outline-primary comment-edit-btn" onclick="editComment(${comment.id})">
+                                    <i class="fas fa-edit"></i> 수정
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteComment(${comment.id})">
+                                    <i class="fas fa-trash-alt"></i> 삭제
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="comment-content">
+                            ${comment.content.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+</body>
+</html>

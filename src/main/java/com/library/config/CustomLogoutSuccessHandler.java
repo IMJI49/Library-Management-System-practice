@@ -24,14 +24,17 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
+        String referer = request.getHeader("referer");
         log.info("=== 로그아웃 성공 ===");
         log.info("사용자 : {}", authentication.getName());
         log.info("권한 : {}", authentication.getAuthorities());
         log.info("IP 주소 : {}", request.getRemoteAddr());
         log.info("로그아웃 시간 : {}", LocalDateTime.now());
+        log.info("마지막 페이지 : {}", referer);
         log.info("=========");
         // 로그아웃 후 로그인 페이지로 리다이렉트
-        response.sendRedirect("/auth/login?logout=true");
+//        response.sendRedirect("/auth/login?logout=true");
+        response.sendRedirect(referer);
 	}
 
 }

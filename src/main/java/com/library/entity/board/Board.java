@@ -1,9 +1,13 @@
 package com.library.entity.board;
 
+import com.library.dto.board.BoardUpdateDto;
 import com.library.entity.entity.BaseEntity;
 import com.library.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
     게시글 Entity
@@ -81,6 +85,15 @@ public class Board extends BaseEntity {
     @Builder.Default
     private BoardCategory category = BoardCategory.FREE;
     /*
+        첨부 파일 목록 1:N관계
+            - 하나의 게시글에 여러 파일 첨부 가능함
+            - cascade : 같이 삭제
+            - orphanRemoval : 게시글에서 파일을 제거하면 db에서도 관련 정보 삭제
+     */
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<BoardFile> files = new ArrayList<>();
+    /*
             비지니스 메소드
                 - 조회수 증가
                     - 게시글 상세보기 시 호출됨
@@ -101,6 +114,11 @@ public class Board extends BaseEntity {
         this.content = content;
         this.category = category;
     }
+    public void update(BoardUpdateDto boardUpdateDto) {
+        this.title = boardUpdateDto.getTitle();
+        this.content = boardUpdateDto.getContent();
+        this.category = boardUpdateDto.getCategory();
+    }
     /*
         게시글 삭제
             - 소프트 삭제 : 실제 데이터를 삭제하지 않고 상태만 DELETED로 변경함
@@ -108,5 +126,13 @@ public class Board extends BaseEntity {
      */
     public void delete() {
         this.status = BoardStatus.DELETED;
+    }
+    /*
+        연관 관계 편의 메소드
+            - 양뱡향 관계를 안전하게 설정
+     */
+    public void addFile(BoardFile file) {
+        this.files.add(file);
+        file.setBoard(this);
     }
 }

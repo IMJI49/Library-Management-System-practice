@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,7 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 @Configuration
 @EnableWebSecurity      // Spring Security 활성화
-@EnableMethodSecurity(prePostEnabled = true)  // 메서드 레벨 보안 활성화
+@EnableMethodSecurity//(prePostEnabled = true)기본값  // 메서드 레벨 보안 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -53,8 +54,7 @@ public class SecurityConfig {
         log.info("=== AuthenticationProvider 설정 시작 ===");
 
         DaoAuthenticationProvider authProvider =
-                new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+                new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 
         log.info("1. userDetailsService 설정 완료");
@@ -76,20 +76,27 @@ public class SecurityConfig {
         http
                 // AuthenticationProvider 등록 (필수)
                 .authenticationProvider(authenticationProvider())
-
+                /*
+                    CSRF 보호 설정 (게시글 삭제 기능을 위해 필수)
+                        - CSRF 보호 활성화(기본값)
+                            - 모든 CRUD 요청에 csrf 토큰 검증
+                            - 토큰이 없거나 잘못된 요청은 403 Forbidden 응답
+                 */
                 .csrf(csrf -> {
-                    csrf.disable();     //개발 단계에서는 비활성화
+//                    csrf.disable();     //개발 단계에서는 비활성화
                     log.info("1. CSRF 보호 비활성화 (운영에서는 활성화 필요!)");
                 })
-
-                .authorizeHttpRequests(authz -> {
-                    authz
+                .authorizeHttpRequests(auth -> {
+                    auth
                             // 누구나 접근 가능 (로그인 불필요)
                             .requestMatchers("/", "/home").permitAll()
                             .requestMatchers("/css/**", "/images/**").permitAll()
                             .requestMatchers("/auth/**", "/register", "/login").permitAll()
                             // 게시판 URL (목록/상세 조회는 모두 허용)
                             .requestMatchers("/boards/**").permitAll()
+//                            .requestMatchers("/api/comments/**").authenticated()
+                            .requestMatchers(HttpMethod.GET,"/api/comments/**").permitAll()
+
                             // 그 외 모든 요청은 인증 필요
                             .anyRequest().authenticated();
                     log.info("2. URL 권한 설정 완료");
@@ -107,10 +114,7 @@ public class SecurityConfig {
                             // 성공/실패 핸들러
                             .successHandler(successHandler)
                             .failureHandler(failureHandler)
-
                             .permitAll();
-
-
                 })
                 .logout(logout -> {
                     log.info("4. 로그아웃 설정 완료");

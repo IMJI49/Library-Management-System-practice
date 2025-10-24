@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 /*
     게시글 Repository
         - Board Entity의 데이터베이스 접근을 담당
@@ -42,4 +44,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
                     "where b.status = :status"
     )
     Page<Board> findByStatusWithAuthor(BoardStatus status, Pageable pageable);
+    /*
+        게시글 단건 조회 Id+상태, 작성자 정보 포함
+            - N+1 문제를 방지하기 위해 FetchJoin을 사용함
+            - Active 상태의 게시글만 조회(삭제된 글은 조회가 불가)
+     */
+    @Query("select b from Board b join fetch b.author where b.id = :id and b.status = :status")
+    Optional<Board> findByIdAndStatusWithAuthor(Long id, BoardStatus status);
 }
